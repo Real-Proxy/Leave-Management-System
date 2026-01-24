@@ -1,0 +1,15 @@
+# ===== Frontend (Angular) =====
+node_modules/
+.angular/
+dist/
+
+# ===== Backend (.NET) =====
+.vs/
+**/bin/
+**/obj/
+
+# ===== Environment / OS =====
+.vscode/
+.env
+.DS_Store
+Thumbs.db
