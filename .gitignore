@@ -1,0 +1,14 @@
+# ===== Angular =====
+node_modules/
+.angular/
+dist/
+
+# ===== .NET =====
+.vs/
+**/bin/
+**/obj/
+
+# ===== Environment =====
+.env
+.DS_Store
+Thumbs.db
