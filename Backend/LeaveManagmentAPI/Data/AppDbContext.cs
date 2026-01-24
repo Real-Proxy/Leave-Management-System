@@ -10,6 +10,8 @@ namespace LeaveManagementAPI.Data
         {
         }
 
+        public DbSet<User> Users { get; set; }
+        public DbSet<LeaveType> LeaveTypes { get; set; }
         public DbSet<LeaveRequest> LeaveRequests { get; set; }
     }
 }
