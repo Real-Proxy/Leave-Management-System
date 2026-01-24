@@ -1,25 +1,27 @@
+using System.Text;
 using LeaveManagementAPI.Data;
-using LeaveManagementAPI.Middleware;
 using LeaveManagementAPI.Services;
 using LeaveManagementAPI; // Required for SeedData
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-
 
 var builder = WebApplication.CreateBuilder(args);
 
-
-
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+
+// Swagger Config for JWT
 builder.Services.AddSwaggerGen(c =>
 {
-    c.AddSecurityDefinition("X-User-Id", new OpenApiSecurityScheme
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        Description = "User ID header for custom auth (e.g. '1' for Admin)",
-        Name = "X-User-Id",
+        Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+        Name = "Authorization",
         In = ParameterLocation.Header,
-        Type = SecuritySchemeType.ApiKey
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer"
     });
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
@@ -29,7 +31,7 @@ builder.Services.AddSwaggerGen(c =>
                 Reference = new OpenApiReference
                 {
                     Type = ReferenceType.SecurityScheme,
-                    Id = "X-User-Id"
+                    Id = "Bearer"
                 }
             },
             new List<string>()
@@ -43,6 +45,32 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // Register Services
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ILeaveTypeService, LeaveTypeService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+
+// JWT Authentication Configuration
+var jwtSettings = builder.Configuration.GetSection("Jwt");
+var key = Encoding.ASCII.GetBytes(jwtSettings["Key"]!);
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.RequireHttpsMetadata = false;
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidIssuer = jwtSettings["Issuer"],
+        ValidAudience = jwtSettings["Audience"],
+        ClockSkew = TimeSpan.Zero
+    };
+});
 
 builder.Services.AddCors(options =>
 {
@@ -55,10 +83,6 @@ builder.Services.AddCors(options =>
         });
 });
 
-// Add services to the container.
-
-builder.Services.AddControllers();
-
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -68,23 +92,18 @@ using (var scope = app.Services.CreateScope())
 }
 
 // Configure the HTTP request pipeline.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-
-
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 
 app.UseCors("AllowAngular");
 
-// Custom Auth Middleware
-app.UseMiddleware<SimpleAuthMiddleware>();
-
+// Authentication & Authorization
+app.UseAuthentication(); 
 app.UseAuthorization();
 
 app.MapControllers();

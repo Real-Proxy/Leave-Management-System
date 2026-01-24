@@ -1,0 +1,19 @@
+@HostAddress = http://localhost:5186
+
+### 1. Login as Admin
+POST {{HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+    "email": "admin@lms.com",
+    "password": "admin"
+}
+
+### 2. Login as Employee (if exists)
+POST {{HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+    "email": "alice@lms.com",
+    "password": "pass"
+}
