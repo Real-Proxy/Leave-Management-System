@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { LeaveService } from '../../services/leave';
 import { Router, NavigationEnd } from '@angular/router';
 import { StatCardComponent } from '../shared/stat-card';
+import { Subscription, filter } from 'rxjs';
 
 @Component({
   selector: 'app-manager-dashboard',
@@ -83,7 +84,7 @@ import { StatCardComponent } from '../shared/stat-card';
     </div>
   `
 })
-export class ManagerDashboardComponent {
+export class ManagerDashboardComponent implements OnInit, OnDestroy {
   pendingLeaves: any[] = [];
   allLeaves: any[] = [];
 
@@ -92,16 +93,26 @@ export class ManagerDashboardComponent {
     teamRejected: 0
   };
 
+  private routerSubscription: Subscription | undefined;
+
   constructor(
     private leaveService: LeaveService,
     private router: Router
-  ) {
-    this.router.events.subscribe(event => {
-      if (event instanceof NavigationEnd) {
-        this.loadData();
-      }
+  ) { }
+
+  ngOnInit() {
+    this.routerSubscription = this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe(() => {
+      this.loadData();
     });
     this.loadData();
+  }
+
+  ngOnDestroy() {
+    if (this.routerSubscription) {
+      this.routerSubscription.unsubscribe();
+    }
   }
 
   loadData() {
