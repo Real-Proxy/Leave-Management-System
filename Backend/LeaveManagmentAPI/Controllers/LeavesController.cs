@@ -1,88 +1,83 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using LeaveManagementAPI.Data;
-using LeaveManagementAPI.Models;
+﻿using LeaveManagementAPI.DTOs;
+using LeaveManagementAPI.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace LeaveManagementAPI.Controllers
 {
     [ApiController]
     [Route("api/leaves")]
+    [Authorize] // Require Login for all endpoints
     public class LeavesController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly ILeaveRequestService _leaveService;
 
-        public LeavesController(AppDbContext context)
+        public LeavesController(ILeaveRequestService leaveService)
         {
-            _context = context;
+            _leaveService = leaveService;
         }
 
-       
         [HttpPost("apply")]
-        public IActionResult ApplyLeave(LeaveRequest request)
+        public async Task<IActionResult> ApplyLeave([FromBody] CreateLeaveRequestDto requestDto)
         {
-            if (request.FromDate > request.ToDate)
+            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? User.FindFirst("id")?.Value;
+            if (!int.TryParse(userIdString, out int userId))
             {
-                return BadRequest("FromDate cannot be after ToDate");
+                return Unauthorized();
             }
 
-            request.Status = "Pending";
-            _context.LeaveRequests.Add(request);
-            _context.SaveChanges();
-
-            return Ok(request);
+            try
+            {
+                var request = await _leaveService.CreateLeaveRequestAsync(userId, requestDto);
+                return Ok(request);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(ex.Message);
+            }
         }
 
-
-        [HttpGet("user/{userId}")]
-        public IActionResult GetUserLeaves(int userId)
+        [HttpGet("my-leaves")]
+        public async Task<IActionResult> GetMyLeaves()
         {
-            var leaves = _context.LeaveRequests
-                .Where(l => l.UserId == userId)
-                .ToList();
+            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? User.FindFirst("id")?.Value;
+            if (!int.TryParse(userIdString, out int userId))
+            {
+                return Unauthorized();
+            }
 
+            var leaves = await _leaveService.GetUserLeavesAsync(userId);
             return Ok(leaves);
         }
 
-       
         [HttpGet("pending")]
-        public IActionResult GetPendingLeaves()
+        [Authorize(Roles = "Manager,Admin")]
+        public async Task<IActionResult> GetPendingLeaves()
         {
-            var pendingLeaves = _context.LeaveRequests
-                .Where(l => l.Status == "Pending")
-                .ToList();
-
-            return Ok(pendingLeaves);
+            var leaves = await _leaveService.GetPendingLeavesAsync();
+            return Ok(leaves);
         }
 
         [HttpPut("{id}/approve")]
-        public IActionResult ApproveLeave(int id)
+        [Authorize(Roles = "Manager,Admin")]
+        public async Task<IActionResult> ApproveLeave(int id)
         {
-            var leave = _context.LeaveRequests.Find(id);
-
-            if (leave == null)
-            {
-                return NotFound("Leave request not found");
-            }
-
-            leave.Status = "Approved";
-            _context.SaveChanges();
-
+            var leave = await _leaveService.ApproveLeaveAsync(id);
+            if (leave == null) return NotFound("Leave request not found");
             return Ok(leave);
         }
 
-
         [HttpPut("{id}/reject")]
-        public IActionResult RejectLeave(int id)
+        [Authorize(Roles = "Manager,Admin")]
+        public async Task<IActionResult> RejectLeave(int id)
         {
-            var leave = _context.LeaveRequests.Find(id);
-
-            if (leave == null)
-            {
-                return NotFound("Leave request not found");
-            }
-
-            leave.Status = "Rejected";
-            _context.SaveChanges();
-
+            var leave = await _leaveService.RejectLeaveAsync(id);
+            if (leave == null) return NotFound("Leave request not found");
             return Ok(leave);
         }
     }
