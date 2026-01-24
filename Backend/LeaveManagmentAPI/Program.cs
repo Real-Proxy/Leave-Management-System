@@ -1,4 +1,6 @@
 using LeaveManagementAPI.Data;
+using LeaveManagementAPI.Middleware;
+using LeaveManagementAPI.Services;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -10,6 +12,10 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite("Data Source=leaves.db"));
+
+// Register Services
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ILeaveTypeService, LeaveTypeService>();
 
 builder.Services.AddCors(options =>
 {
@@ -33,7 +39,8 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.EnsureCreated();
+    // db.Database.EnsureCreated(); // Handled in SeedData
+    SeedData.Initialize(scope.ServiceProvider);
 }
 
 
@@ -53,6 +60,9 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseCors("AllowAngular");
+
+// Custom Auth Middleware
+app.UseMiddleware<SimpleAuthMiddleware>();
 
 app.UseAuthorization();
 
