@@ -1,28 +1,61 @@
-<nav class="bg-gray-800 p-4 text-white mb-4">
-  <div class="container mx-auto flex justify-between items-center">
-    <a routerLink="/" class="text-xl font-bold">LMS</a>
-    
-    <div class="space-x-4">
-      <ng-container *ngIf="authService.currentUser$ | async as user; else guestLinks">
-        <span class="text-gray-300">Welcome, {{ user.email }}</span>
-        
-        <a routerLink="/dashboard" class="hover:text-gray-300">My Leaves</a>
-        <a routerLink="/apply" class="hover:text-gray-300">Apply</a>
-        
-        <a *ngIf="user.role === 'Admin' || user.role === 'Manager'" 
-           routerLink="/admin" class="hover:text-gray-300">Manager Dashboard</a>
-        
-        <button (click)="logout()" class="bg-red-600 hover:bg-red-700 px-3 py-1 rounded">Logout</button>
-      </ng-container>
-      
-      <ng-template #guestLinks>
-        <a routerLink="/login" class="hover:text-gray-300">Login</a>
-        <a routerLink="/signup" class="hover:text-gray-300">Sign Up</a>
-      </ng-template>
+<nav class="bg-white border-b border-gray-200 sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between h-16">
+      <div class="flex">
+        <div class="flex-shrink-0 flex items-center">
+          <a routerLink="/"
+            class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
+            LMS
+          </a>
+        </div>
+        <div class="hidden sm:ml-6 sm:flex sm:space-x-8 items-center" *ngIf="authService.currentUser$ | async as user">
+
+          <a routerLink="/dashboard" routerLinkActive="border-indigo-500 text-gray-900"
+            class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium h-full">
+            Dashboard
+          </a>
+
+          <a routerLink="/apply" routerLinkActive="border-indigo-500 text-gray-900"
+            class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium h-full">
+            Apply
+          </a>
+
+          <a *ngIf="user.role === 'Admin' || user.role === 'Manager'" routerLink="/admin"
+            routerLinkActive="border-indigo-500 text-gray-900"
+            class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium h-full">
+            Manager
+          </a>
+        </div>
+      </div>
+
+      <div class="flex items-center">
+        <ng-container *ngIf="authService.currentUser$ | async as user; else guestLinks">
+          <div class="flex items-center space-x-4">
+            <div class="flex flex-col text-right">
+              <span class="text-sm font-medium text-gray-900">{{ user.email }}</span>
+              <span class="text-xs text-gray-500">{{ user.role }}</span>
+            </div>
+            <button (click)="logout()"
+              class="ml-3 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none shadow-sm transition-colors duration-200">
+              Logout
+            </button>
+          </div>
+        </ng-container>
+
+        <ng-template #guestLinks>
+          <div class="flex space-x-4">
+            <a routerLink="/login"
+              class="text-gray-500 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Log in</a>
+            <a routerLink="/signup"
+              class="bg-indigo-600 text-white hover:bg-indigo-700 px-4 py-2 rounded-md text-sm font-medium shadow-sm">Sign
+              up</a>
+          </div>
+        </ng-template>
+      </div>
     </div>
   </div>
 </nav>
 
-<div class="container mx-auto px-4">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
   <router-outlet></router-outlet>
 </div>

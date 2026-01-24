@@ -19,6 +19,7 @@ export interface RegisterDto {
   name: string;
   email: string;
   password: string;
+  role: string;
 }
 
 @Injectable({
@@ -27,13 +28,13 @@ export interface RegisterDto {
 export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
-  
+
   private apiUrl = 'http://localhost:5186/api/auth';
   private currentUserSubject = new BehaviorSubject<AuthResponse | null>(this.getUserFromStorage());
-  
+
   currentUser$ = this.currentUserSubject.asObservable();
 
-  constructor() {}
+  constructor() { }
 
   login(credentials: LoginDto): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials).pipe(

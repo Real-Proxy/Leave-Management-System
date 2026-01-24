@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { LeaveService } from '../../services/leave';
 import { Router, NavigationEnd } from '@angular/router';
 import { StatCardComponent } from '../shared/stat-card';
+import { Subscription, filter } from 'rxjs';
 
 @Component({
   selector: 'app-leave-list',
@@ -41,42 +42,58 @@ import { StatCardComponent } from '../shared/stat-card';
       </div>
 
       <!-- Filters & List -->
-      <div class="bg-white shadow overflow-hidden sm:rounded-md">
-        <div class="px-4 py-5 border-b border-gray-200 sm:px-6">
+      <div class="bg-white shadow overflow-hidden sm:rounded-lg border border-gray-200">
+        <div class="px-4 py-5 border-b border-gray-200 sm:px-6 flex justify-between items-center">
           <h3 class="text-lg leading-6 font-medium text-gray-900">Leave History</h3>
+          <a routerLink="/apply" class="text-indigo-600 hover:text-indigo-900 text-sm font-medium">
+            + New Request
+          </a>
         </div>
-        <ul role="list" class="divide-y divide-gray-200">
-          <li *ngFor="let leave of leaves" class="px-4 py-4 sm:px-6">
-            <div class="flex items-center justify-between">
-              <p class="text-sm font-medium text-indigo-600 truncate">
-                {{ leave.leaveType?.name || 'Leave' }}
-              </p>
-              <div class="ml-2 flex-shrink-0 flex">
-                <span [class]="getStatusClass(leave.status) + ' px-2 inline-flex text-xs leading-5 font-semibold rounded-full'">
-                  {{ leave.status }}
-                </span>
-              </div>
-            </div>
-            <div class="mt-2 sm:flex sm:justify-between">
-              <div class="sm:flex">
-                <p class="flex items-center text-sm text-gray-500">
-                  {{ leave.fromDate | date }} - {{ leave.toDate | date }}
-                </p>
-                <p class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0 sm:ml-6">
+        
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dates</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Days</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reason</th>
+                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <tr *ngFor="let leave of leaves" class="hover:bg-gray-50 transition-colors">
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  {{ leave.leaveType?.name || 'Leave' }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {{ leave.fromDate | date:'mediumDate' }} - {{ leave.toDate | date:'mediumDate' }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {{ getDays(leave.fromDate, leave.toDate) }} days
+                </td>
+                 <td class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate" title="{{ leave.reason }}">
                   {{ leave.reason }}
-                </p>
-              </div>
-            </div>
-          </li>
-          <li *ngIf="leaves.length === 0" class="px-4 py-4 sm:px-6 text-gray-500 text-center">
-            No leaves found.
-          </li>
-        </ul>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <span [class]="getStatusClass(leave.status) + ' px-2.5 py-0.5 rounded-full text-xs font-medium'">
+                    {{ leave.status }}
+                  </span>
+                </td>
+              </tr>
+              <tr *ngIf="leaves.length === 0">
+                <td colspan="5" class="px-6 py-10 text-center text-gray-500">
+                  No leave history found. Start by applying for one!
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   `
 })
-export class LeaveListComponent {
+export class LeaveListComponent implements OnInit, OnDestroy {
   leaves: any[] = [];
   leaveTypes: any[] = [];
 
@@ -87,17 +104,26 @@ export class LeaveListComponent {
   };
 
   leavesLeft = 0;
+  private routerSubscription: Subscription | undefined;
 
   constructor(
     private leaveService: LeaveService,
     private router: Router
-  ) {
-    this.router.events.subscribe(event => {
-      if (event instanceof NavigationEnd) {
-        this.loadData();
-      }
+  ) { }
+
+  ngOnInit() {
+    this.routerSubscription = this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe(() => {
+      this.loadData();
     });
-    this.loadData(); // Initial load
+    this.loadData();
+  }
+
+  ngOnDestroy() {
+    if (this.routerSubscription) {
+      this.routerSubscription.unsubscribe();
+    }
   }
 
   loadData() {

@@ -15,11 +15,11 @@ export class LeaveService {
   }
 
   getUserLeaves() {
-    return this.http.get(`${this.apiUrl}/my-leaves`);
+    return this.http.get(`${this.apiUrl}/my-leaves?t=${new Date().getTime()}`);
   }
 
   getPendingLeaves() {
-    return this.http.get(`${this.apiUrl}/pending`);
+    return this.http.get(`${this.apiUrl}/pending?t=${new Date().getTime()}`);
   }
 
   approveLeave(id: number) {
@@ -35,6 +35,6 @@ export class LeaveService {
   }
 
   getAllLeaves() {
-    return this.http.get(`${this.apiUrl}/all`);
+    return this.http.get(`${this.apiUrl}/all?t=${new Date().getTime()}`);
   }
 }

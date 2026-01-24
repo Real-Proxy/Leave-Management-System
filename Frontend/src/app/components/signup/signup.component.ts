@@ -5,10 +5,10 @@ import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
-    selector: 'app-signup',
-    standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, RouterModule],
-    template: `
+  selector: 'app-signup',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  template: `
     <div class="flex min-h-screen items-center justify-center bg-gray-100">
       <div class="w-full max-w-md space-y-8 rounded-lg bg-white p-8 shadow-md">
         <div>
@@ -33,6 +33,15 @@ import { AuthService } from '../../services/auth.service';
               <input id="password" type="password" formControlName="password" required 
                 class="relative block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm" 
                 placeholder="Password">
+            </div>
+            <div>
+              <label for="role" class="sr-only">Role</label>
+              <select id="role" formControlName="role" required
+                class="relative block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm">
+                <option value="Employee">Employee</option>
+                <option value="Manager">Manager</option>
+                <option value="Admin">Admin</option>
+              </select>
             </div>
           </div>
 
@@ -59,39 +68,40 @@ import { AuthService } from '../../services/auth.service';
   `
 })
 export class SignupComponent {
-    private fb = inject(FormBuilder);
-    private authService = inject(AuthService);
-    private router = inject(Router);
+  private fb = inject(FormBuilder);
+  private authService = inject(AuthService);
+  private router = inject(Router);
 
-    signupForm = this.fb.group({
-        name: ['', [Validators.required]],
-        email: ['', [Validators.required, Validators.email]],
-        password: ['', [Validators.required, Validators.minLength(4)]]
-    });
+  signupForm = this.fb.group({
+    name: ['', [Validators.required]],
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', [Validators.required, Validators.minLength(4)]],
+    role: ['Employee', [Validators.required]]
+  });
 
-    isLoading = false;
-    errorMessage = '';
+  isLoading = false;
+  errorMessage = '';
 
-    onSubmit() {
-        if (this.signupForm.valid) {
-            this.isLoading = true;
-            this.errorMessage = '';
+  onSubmit() {
+    if (this.signupForm.valid) {
+      this.isLoading = true;
+      this.errorMessage = '';
 
-            this.authService.register(this.signupForm.value as any).subscribe({
-                next: (res) => {
-                    this.isLoading = false;
-                    this.router.navigate(['/dashboard']);
-                },
-                error: (err) => {
-                    this.isLoading = false;
-                    if (err.status === 400) {
-                        this.errorMessage = err.error || 'Registration failed. Email might check used.';
-                    } else {
-                        this.errorMessage = 'Registration failed. Please try again.';
-                    }
-                    console.error(err);
-                }
-            });
+      this.authService.register(this.signupForm.value as any).subscribe({
+        next: (res) => {
+          this.isLoading = false;
+          this.router.navigate(['/dashboard']);
+        },
+        error: (err) => {
+          this.isLoading = false;
+          if (err.status === 400) {
+            this.errorMessage = err.error || 'Registration failed. Email might check used.';
+          } else {
+            this.errorMessage = 'Registration failed. Please try again.';
+          }
+          console.error(err);
         }
+      });
     }
+  }
 }

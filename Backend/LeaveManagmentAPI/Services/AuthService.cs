@@ -26,12 +26,17 @@ namespace LeaveManagementAPI.Services
                 return null; // Email already exists
             }
 
+            if (!Enum.TryParse<Models.UserRole>(registerDto.Role, true, out var role))
+            {
+                role = Models.UserRole.Employee;
+            }
+
             var user = new Models.User
             {
                 Name = registerDto.Name,
                 Email = registerDto.Email,
                 Password = registerDto.Password, // Ideally hash this
-                Role = Models.UserRole.Employee // Default role
+                Role = role
             };
 
             _context.Users.Add(user);

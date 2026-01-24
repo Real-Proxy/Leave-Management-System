@@ -36,34 +36,49 @@ import { StatCardComponent } from '../shared/stat-card';
       </div>
 
       <!-- Pending List -->
-      <div class="bg-white shadow overflow-hidden sm:rounded-md mt-6">
+      <div class="bg-white shadow overflow-hidden sm:rounded-lg border border-gray-200 mt-6">
         <div class="px-4 py-5 border-b border-gray-200 sm:px-6">
           <h3 class="text-lg leading-6 font-medium text-gray-900">Pending Requests</h3>
         </div>
-        <ul role="list" class="divide-y divide-gray-200">
-          <li *ngFor="let leave of pendingLeaves" class="px-4 py-4 sm:px-6">
-            <div class="flex items-center justify-between">
-              <div>
-                 <p class="text-sm font-medium text-indigo-600 truncate">
-                  {{ leave.user?.name || 'Unknown User' }} ({{ leave.leaveType?.name }})
-                </p>
-                <div class="mt-2 text-sm text-gray-500">
-                  {{ leave.fromDate | date }} - {{ leave.toDate | date }}
-                </div>
-                <div class="text-sm text-gray-500 italic">
-                  "{{ leave.reason }}"
-                </div>
-              </div>
-              <div class="flex space-x-2">
-                 <button (click)="approve(leave.id)" class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 text-sm">Approve</button>
-                 <button (click)="reject(leave.id)" class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 text-sm">Reject</button>
-              </div>
-            </div>
-          </li>
-          <li *ngIf="pendingLeaves.length === 0" class="px-4 py-4 sm:px-6 text-gray-500 text-center">
-            No pending requests. Good job!
-          </li>
-        </ul>
+        
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employee</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dates</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reason</th>
+                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <tr *ngFor="let leave of pendingLeaves" class="hover:bg-gray-50 transition-colors">
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  {{ leave.user?.name || 'Unknown User' }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {{ leave.leaveType?.name }}
+                </td>
+                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {{ leave.fromDate | date:'mediumDate' }} - {{ leave.toDate | date:'mediumDate' }}
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate" title="{{ leave.reason }}">
+                  {{ leave.reason }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                   <button (click)="approve(leave.id)" class="text-green-600 hover:text-green-900 bg-green-50 hover:bg-green-100 px-3 py-1 rounded-md transition-colors">Approve</button>
+                   <button (click)="reject(leave.id)" class="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 px-3 py-1 rounded-md transition-colors">Reject</button>
+                </td>
+              </tr>
+              <tr *ngIf="pendingLeaves.length === 0">
+                <td colspan="5" class="px-6 py-10 text-center text-gray-500">
+                  No pending requests to review.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   `
