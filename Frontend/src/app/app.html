@@ -1,9 +1,28 @@
-<nav>
-  <a routerLink="/apply">Apply Leave</a>
-  <a routerLink="/my-leaves">My Leaves</a>
-  <a routerLink="/manager">Manager Dashboard</a>
+<nav class="bg-gray-800 p-4 text-white mb-4">
+  <div class="container mx-auto flex justify-between items-center">
+    <a routerLink="/" class="text-xl font-bold">LMS</a>
+    
+    <div class="space-x-4">
+      <ng-container *ngIf="authService.currentUser$ | async as user; else guestLinks">
+        <span class="text-gray-300">Welcome, {{ user.email }}</span>
+        
+        <a routerLink="/dashboard" class="hover:text-gray-300">My Leaves</a>
+        <a routerLink="/apply" class="hover:text-gray-300">Apply</a>
+        
+        <a *ngIf="user.role === 'Admin' || user.role === 'Manager'" 
+           routerLink="/admin" class="hover:text-gray-300">Manager Dashboard</a>
+        
+        <button (click)="logout()" class="bg-red-600 hover:bg-red-700 px-3 py-1 rounded">Logout</button>
+      </ng-container>
+      
+      <ng-template #guestLinks>
+        <a routerLink="/login" class="hover:text-gray-300">Login</a>
+        <a routerLink="/signup" class="hover:text-gray-300">Sign Up</a>
+      </ng-template>
+    </div>
+  </div>
 </nav>
 
-<div class="container">
+<div class="container mx-auto px-4">
   <router-outlet></router-outlet>
 </div>

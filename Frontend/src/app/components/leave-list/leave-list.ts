@@ -26,7 +26,7 @@ export class LeaveListComponent {
   }
 
   loadLeaves() {
-    this.leaveService.getUserLeaves(1).subscribe((res: any) => {
+    this.leaveService.getUserLeaves().subscribe((res: any) => {
       const data = res.$values ?? res;
 
       this.leaves = data.map((l: any) => ({

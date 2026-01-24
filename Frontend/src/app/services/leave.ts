@@ -6,16 +6,16 @@ import { Injectable } from '@angular/core';
 })
 export class LeaveService {
 
-  private apiUrl = 'https://localhost:7217/api/leaves';
+  private apiUrl = 'http://localhost:5186/api/leaves';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   applyLeave(data: any) {
     return this.http.post(`${this.apiUrl}/apply`, data);
   }
 
-  getUserLeaves(userId: number) {
-    return this.http.get(`${this.apiUrl}/user/${userId}`);
+  getUserLeaves() {
+    return this.http.get(`${this.apiUrl}/my-leaves`);
   }
 
   getPendingLeaves() {

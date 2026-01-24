@@ -12,13 +12,13 @@ import { LeaveService } from '../../services/leave';
 })
 export class ApplyLeaveComponent {
   leave = {
-    userId: 1,
+    leaveTypeId: 1, // Defaulting to first type for now
     fromDate: '',
     toDate: '',
     reason: ''
   };
 
-  constructor(private leaveService: LeaveService) {}
+  constructor(private leaveService: LeaveService) { }
 
   submit() {
     this.leaveService.applyLeave(this.leave).subscribe(() => {

@@ -26,5 +26,17 @@ namespace LeaveManagementAPI.Controllers
 
             return Ok(result);
         }
+
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
+        {
+            var result = await _authService.RegisterAsync(registerDto);
+            if (result == null)
+            {
+                return BadRequest("Email already exists");
+            }
+
+            return Ok(result);
+        }
     }
 }

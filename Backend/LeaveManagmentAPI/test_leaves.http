@@ -1,0 +1,62 @@
+@HostAddress = http://localhost:5186
+@AdminToken = {{loginAdmin.response.body.token}}
+@EmployeeToken = {{loginEmployee.response.body.token}}
+
+### 1. Register New Employee
+POST {{HostAddress}}/api/auth/register
+Content-Type: application/json
+
+{
+    "name": "Test Employee",
+    "email": "test@lms.com",
+    "password": "pass"
+}
+
+### 2. Login as Admin
+# @name loginAdmin
+POST {{HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+    "email": "admin@lms.com",
+    "password": "admin"
+}
+
+### 3. Login as Employee
+# @name loginEmployee
+POST {{HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+    "email": "test@lms.com",
+    "password": "pass"
+}
+
+### 4. Get Leave Types (Admin)
+GET {{HostAddress}}/api/admin/leavetypes
+Authorization: Bearer {{AdminToken}}
+
+### 5. Apply for Leave (Employee)
+POST {{HostAddress}}/api/leaves/apply
+Content-Type: application/json
+Authorization: Bearer {{EmployeeToken}}
+
+{
+    "leaveTypeId": 1,
+    "fromDate": "2026-05-01",
+    "toDate": "2026-05-05",
+    "reason": "Vacation"
+}
+
+### 6. Get My Leaves (Employee)
+GET {{HostAddress}}/api/leaves/my-leaves
+Authorization: Bearer {{EmployeeToken}}
+
+### 7. Get Pending Leaves (Admin)
+GET {{HostAddress}}/api/leaves/pending
+Authorization: Bearer {{AdminToken}}
+
+# Note: Replace Leave ID manually for Approve/Reject test
+### 8. Approve Leave (Admin)
+PUT {{HostAddress}}/api/leaves/1/approve
+Authorization: Bearer {{AdminToken}}

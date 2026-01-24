@@ -19,6 +19,34 @@ namespace LeaveManagementAPI.Services
             _configuration = configuration;
         }
 
+        public async Task<AuthResponseDto?> RegisterAsync(RegisterDto registerDto)
+        {
+            if (await _context.Users.AnyAsync(u => u.Email == registerDto.Email))
+            {
+                return null; // Email already exists
+            }
+
+            var user = new Models.User
+            {
+                Name = registerDto.Name,
+                Email = registerDto.Email,
+                Password = registerDto.Password, // Ideally hash this
+                Role = Models.UserRole.Employee // Default role
+            };
+
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+
+            var token = GenerateJwtToken(user);
+            return new AuthResponseDto
+            {
+                Token = token,
+                Email = user.Email,
+                Role = user.Role.ToString(),
+                UserId = user.Id
+            };
+        }
+
         public async Task<AuthResponseDto?> LoginAsync(LoginDto loginDto)
         {
             var user = await _context.Users
