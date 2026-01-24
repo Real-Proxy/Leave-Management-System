@@ -1,0 +1,8 @@
+﻿namespace LeaveManagementAPI.Models.Enums
+{
+    public enum UserRole
+    {
+        Employee = 1,
+        Manager = 2
+    }
+}
