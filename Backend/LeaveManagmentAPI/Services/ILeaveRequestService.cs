@@ -10,5 +10,6 @@ namespace LeaveManagementAPI.Services
         Task<IEnumerable<LeaveRequest>> GetPendingLeavesAsync();
         Task<LeaveRequest?> ApproveLeaveAsync(int id);
         Task<LeaveRequest?> RejectLeaveAsync(int id);
+        Task<IEnumerable<LeaveRequest>> GetAllLeavesAsync();
     }
 }

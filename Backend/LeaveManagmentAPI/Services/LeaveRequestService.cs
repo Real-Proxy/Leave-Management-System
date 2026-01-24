@@ -101,5 +101,13 @@ namespace LeaveManagementAPI.Services
             await _context.SaveChangesAsync();
             return leave;
         }
+        public async Task<IEnumerable<LeaveRequest>> GetAllLeavesAsync()
+        {
+            return await _context.LeaveRequests
+                .Include(l => l.User)
+                .Include(l => l.LeaveType)
+                .OrderByDescending(l => l.RequestDate)
+                .ToListAsync();
+        }
     }
 }

@@ -29,4 +29,12 @@ export class LeaveService {
   rejectLeave(id: number) {
     return this.http.put(`${this.apiUrl}/${id}/reject`, {});
   }
+
+  getLeaveTypes() {
+    return this.http.get(`${this.apiUrl}/types`);
+  }
+
+  getAllLeaves() {
+    return this.http.get(`${this.apiUrl}/all`);
+  }
 }

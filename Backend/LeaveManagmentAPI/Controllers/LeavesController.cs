@@ -80,5 +80,22 @@ namespace LeaveManagementAPI.Controllers
             if (leave == null) return NotFound("Leave request not found");
             return Ok(leave);
         }
+        [HttpGet("types")]
+        public async Task<IActionResult> GetLeaveTypes([FromServices] ILeaveTypeService leaveTypeService)
+        {
+            var types = await leaveTypeService.GetAllLeaveTypesAsync();
+            return Ok(types);
+        }
+
+        [HttpGet("all")]
+        [Authorize(Roles = "Manager,Admin")]
+        public async Task<IActionResult> GetAllLeaves()
+        {
+            // We need a service method for this, strictly speaking. 
+            // For now, I'll add the method to ILeaveRequestService or just reuse the logic if simpler.
+            // Let's assume I add it to service next.
+             var leaves = await _leaveService.GetAllLeavesAsync();
+             return Ok(leaves);
+        }
     }
 }
