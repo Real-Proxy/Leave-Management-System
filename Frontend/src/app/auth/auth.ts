@@ -24,9 +24,10 @@ export class AuthService {
     return this.http.post(`${this.apiUrl}/register`, data);
   }
 
-  saveAuth(token: string, role: number) {
+  saveAuth(token: string, user: any) {
     localStorage.setItem('token', token);
-    localStorage.setItem('role', role.toString());
+    localStorage.setItem('role', user.role.toString());
+    localStorage.setItem('user', JSON.stringify(user));
   }
 
   logout() {
@@ -34,12 +35,17 @@ export class AuthService {
     this.router.navigate(['/login']);
   }
 
-  getToken() {
+  getToken(): string | null {
     return localStorage.getItem('token');
   }
 
-  getRole():number {
+  getRole(): number {
     return Number(localStorage.getItem('role'));
+  }
+
+  getUser() {
+    const user = localStorage.getItem('user');
+    return user ? JSON.parse(user) : null;
   }
 
   isLoggedIn(): boolean {

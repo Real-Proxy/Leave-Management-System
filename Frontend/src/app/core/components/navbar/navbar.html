@@ -1,0 +1,22 @@
+<nav style="padding: 10px; border-bottom: 1px solid #ccc;">
+  <a routerLink="/">Home</a>
+
+  <span *ngIf="auth.isLoggedIn()">
+    | Logged in as: {{ auth.getUser()?.email }}
+
+    <ng-container *ngIf="auth.getRole() === 1">
+      | <a routerLink="/employee/dashboard">Employee Dashboard</a>
+    </ng-container>
+
+    <ng-container *ngIf="auth.getRole() === 2">
+      | <a routerLink="/manager/dashboard">Manager Dashboard</a>
+    </ng-container>
+
+    | <button (click)="logout()">Logout</button>
+  </span>
+
+  <span *ngIf="!auth.isLoggedIn()">
+    | <a routerLink="/login">Login</a>
+    | <a routerLink="/register">Register</a>
+  </span>
+</nav>

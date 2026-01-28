@@ -10,14 +10,15 @@ import { AuthService } from '../../auth/auth';
   imports: [CommonModule, FormsModule],
   templateUrl: './register.html'
 })
+
 export class Register {
   name = '';
   email = '';
   password = '';
   role = 1;
 
-  error = '';
   loading = false;
+  error = '';
 
   constructor(
     private authService: AuthService,
@@ -38,7 +39,7 @@ export class Register {
         this.loading = false;
         this.router.navigate(['/login']);
       },
-      error: err => {
+      error: (err) => {
         this.loading = false;
         this.error = err.error || 'Registration failed';
       }

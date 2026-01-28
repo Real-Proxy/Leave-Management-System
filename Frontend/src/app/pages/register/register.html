@@ -1,46 +1,24 @@
 <h2>Register</h2>
 
-<p *ngIf="error" style="color:red">{{ error }}</p>
-
 <form (ngSubmit)="register()">
-  <input
-    type="text"
-    placeholder="Name"
-    [(ngModel)]="name"
-    name="name"
-    required
-  />
+  <label>Name</label><br />
+  <input [(ngModel)]="name" name="name" required /><br /><br />
 
-  <br /><br />
+  <label>Email</label><br />
+  <input type="email" [(ngModel)]="email" name="email" required /><br /><br />
 
-  <input
-    type="email"
-    placeholder="Email"
-    [(ngModel)]="email"
-    name="email"
-    required
-  />
+  <label>Password</label><br />
+  <input type="password" [(ngModel)]="password" name="password" required /><br /><br />
 
-  <br /><br />
-
-  <input
-    type="password"
-    placeholder="Password"
-    [(ngModel)]="password"
-    name="password"
-    required
-  />
-
-  <br /><br />
-
+  <label>Role</label><br />
   <select [(ngModel)]="role" name="role">
-    <option [ngValue]="1">Employee</option>
-    <option [ngValue]="2">Manager</option>
-  </select>
-
-  <br /><br />
+    <option [value]="1">Employee</option>
+    <option [value]="2">Manager</option>
+  </select><br /><br />
 
   <button type="submit" [disabled]="loading">
     {{ loading ? 'Registering...' : 'Register' }}
   </button>
+
+  <p style="color:red" *ngIf="error">{{ error }}</p>
 </form>

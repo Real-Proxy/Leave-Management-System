@@ -9,9 +9,11 @@ import { FormsModule } from '@angular/forms';
   imports: [FormsModule],
   templateUrl: './login.html'
 })
+
 export class Login {
   email = '';
   password = '';
+  loading = false;
   error = '';
 
   constructor(
@@ -20,22 +22,30 @@ export class Login {
   ) {}
 
   login() {
-    this.authService.login(this.email, this.password).subscribe({
-    next: (res) => {
-      this.authService.saveAuth(res.token, res.role);
+    this.error = '';
+    this.loading = true;
 
-      if (res.role === 1) {
-        // Employee
-        this.router.navigate(['/employee/dashboard']);
-      } else if (res.role === 2) {
-        // Manager
-        this.router.navigate(['/manager/dashboard']);
-      }
+    this.authService.login(this.email, this.password).subscribe({
+      next: (res) => {
+        this.loading = false;
+
+        this.authService.saveAuth(res.token, {
+          id: res.id,
+          name: res.name,
+          email: res.email,
+          role: res.role
+        });
+
+        if (res.role === 1) {
+          this.router.navigate(['/employee/dashboard']);
+        } else {
+          this.router.navigate(['/manager/dashboard']);
+        }
       },
       error: () => {
+        this.loading = false;
         this.error = 'Invalid email or password';
       }
     });
   }
 }
-

@@ -1,12 +1,15 @@
-import { Component, signal } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { Navbar } from './core/components/navbar/navbar';
+import { AuthService } from './auth/auth';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
-  templateUrl: './app.html',
-  styleUrl: './app.css'
+  standalone: true,
+  imports: [RouterOutlet, Navbar, CommonModule],
+  templateUrl: './app.html'
 })
 export class App {
-  protected readonly title = signal('ui');
+  constructor(public auth: AuthService) {}
 }
