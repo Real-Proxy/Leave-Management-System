@@ -1,2 +1,46 @@
-<h1>Register</h1>
-<p>Register page works</p>
+<h2>Register</h2>
+
+<p *ngIf="error" style="color:red">{{ error }}</p>
+
+<form (ngSubmit)="register()">
+  <input
+    type="text"
+    placeholder="Name"
+    [(ngModel)]="name"
+    name="name"
+    required
+  />
+
+  <br /><br />
+
+  <input
+    type="email"
+    placeholder="Email"
+    [(ngModel)]="email"
+    name="email"
+    required
+  />
+
+  <br /><br />
+
+  <input
+    type="password"
+    placeholder="Password"
+    [(ngModel)]="password"
+    name="password"
+    required
+  />
+
+  <br /><br />
+
+  <select [(ngModel)]="role" name="role">
+    <option [ngValue]="1">Employee</option>
+    <option [ngValue]="2">Manager</option>
+  </select>
+
+  <br /><br />
+
+  <button type="submit" [disabled]="loading">
+    {{ loading ? 'Registering...' : 'Register' }}
+  </button>
+</form>
