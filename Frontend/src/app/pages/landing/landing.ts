@@ -7,4 +7,4 @@ import { RouterLink } from '@angular/router';
   imports: [RouterLink],
   templateUrl: './landing.html'
 })
-export class LandingComponent {}
+export class Landing {}
